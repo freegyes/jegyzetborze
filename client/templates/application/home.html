@@ -1,42 +1,100 @@
 <template name="home">
   {{#if currentUser}}
-    logged in
-  {{else}}
-    <form>
-      <div class="form-group">
-        <label for="isbn">Type ISBN</label>
-        <div class="input-group">
-          <input type="text" id="isbn" class="form-control" placeholder="963825419X" val="">
-          <span class="input-group-btn">
-            <button class="btn btn-default callServer" type="button">Fill in the form 
-              <span class="fa fa-caret-right"></span>
-            </button>
-          </span>
-        </div>
+
+  <form>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Add el a könyved</h3>
       </div>
-      <div class="row">
-        <div class="col-md-3">
-          <img id="cover" class="img-responsive img-thumbnail" src="{{cover}}">
-        </div>
-        <div class="col-md-9">
-          <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" id="title" class="form-control" placeholder="The title" val="{{title}}">
+      <div class="panel-body">
+        <div class="row">          
+          <div class="form-group col-md-5">
+            <label for="isbn">Ha tudod az ISBN-t:</label>
+            <div class="input-group">
+              <input type="text" id="isbn" class="form-control" placeholder="9789632275451" val="">
+              <span class="input-group-btn">
+                <button class="btn btn-default callServer" type="button">Kitöltőmágia 
+                  <span class="fa fa-caret-right"></span>
+                </button>
+              </span>
+            </div>
+            <span class="help-block">Az ISBN számot általában a könyv vonalkódján találod meg (régebbi könyveknél pedig legtöbbször az utolsó lapok egyikén).</span>
           </div>
-          <div class="form-group">
-            <label for="title">Author(s)</label>
-            <input type="text" id="author" class="form-control" placeholder="Author's" val="{{author}}">
+          <div class="col-md-2">
+            <div class="thumbnail">
+              <a href="{{link}}">
+                <img src="{{cover}}" class="img-responsive" title="Köszönjük a Moly.hu-nak a segítséget!" alt="Köszönjük a Moly.hu-nak a segítséget!">
+              </a>
+            </div>
+          </div>
+          <div class="form-group col-md-5">
+            <label for="search">Vagy keress cím, szerző alapján</label>
+            <input type="text" id="search" class="form-control" placeholder="Csak kezdd el gépelni..." val="">
           </div>
         </div>
+
+        <h5 class="text-muted"><span>a könyv</span></h5>
+
+        <div class="row">
+          <div class="col-md-10">
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input type="text" id="title" class="form-control" placeholder="The title" val="{{title}}">
+            </div>
+            <div class="form-group">
+              <label for="title">Author(s)</label>
+              <input type="text" id="author" class="form-control" placeholder="Author's" val="{{author}}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <img id="cover" class="img-responsive img-thumbnail" src="{{cover}}">
+          </div>
+        </div>
+
+        <h5 class="text-muted"><span>a részletek</span></h5>
+
+        <div class="form-group">
+          <label for="status">Állapot:</label>
+          <select id="status" class="form-control">
+            <option>Érintetlen.</option>
+            <option>Kultúrhasznált.</option>
+            <option>Beleírtam, aláhúztam benne.</option>
+            <option>Táskakopott.</option>
+            <option>Rongyosra tanult.</option>
+            <option>Szétesik.</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Irányár:</label>
+          <div class="input-group">
+            <input type="text" id="price" class="form-control" placeholder="The price" val="">
+            <span class="input-group-addon">
+              Ft
+            </span>
+          </div>
+        </div>
+
+        <h5 class="text-muted"><span>a kapcsolat Veled</span></h5>
+
+      <button type="submit" class="btn btn-default btn-block">Submit</button>
+      
       </div>
+    </div>
+
+    
+      
+      
 
 
-      <button type="submit" class="btn btn-default">Submit</button>
     </form>
 
     {{#each books}}
-      <h1>title</h1>
+      <h1>{{ book.submitted }} title</h1>
     {{/each}}
 
+  {{else}}
+  logged out
   {{/if}}
 </template>
