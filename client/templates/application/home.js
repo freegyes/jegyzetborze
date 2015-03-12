@@ -3,9 +3,14 @@ Template.home.created = function () {
   Session.set('title', '');
   Session.set('id', '');
   Session.set('cover', '/moly-logo.jpeg');
+  Session.set('coverLabel', 'Köszi, Moly!');
   Session.set('link', 'http://moly.hu');
   Session.set('results', []);
 };
+
+Template.home.rendered = function() {
+  $('.toHide').hide();
+}
 
 Template.home.helpers({
   books: function() {
@@ -19,6 +24,9 @@ Template.home.helpers({
   },
   cover: function () {
     return Session.get('cover');
+  },
+  coverLabel: function () {
+    return Session.get('coverLabel');
   },
   link: function() {
     return Session.get('link');
@@ -41,19 +49,17 @@ Template.home.events({
   //       //throwError("This new excellent thought was successfully added to your mind-palace.", "success");  
   //   });
   // },
-  'click .callServer': function () {
+  'click .callServer': _.debounce(function (e) {
+    e.preventDefault();
+
     var isbn = $('#isbn').val(); 
 
     Meteor.call('checkMolyISBN', isbn, function(error, result) {
       if (error) {
-        return console.log(error.reason);
-        //return throwError("Are you sure this is a valid URL?", "warning");
+        return Notifications.error('Valami nem stimmel.', 'Biztos vagy benne, hogy ez egy létező könyv?');
       } else if (!(result.data)) {
-        console.log("dog");
-        return console.log(error.reason);
-        //return throwError("Dunno this isbn", "warning");
+        return Notifications.warn('Valami nem stimmel.', 'Sajnos ez az ISBN szám nincs regisztrálva az adatbázisban.');
       } else {
-
         var data = $.parseJSON(result.content);
 
         $('#author').val(data.author);
@@ -61,14 +67,15 @@ Template.home.events({
 
         Session.set('author', data.author);
         Session.set('title', data.title);
-        if (data.cover) {Session.set('cover', data.cover);};
+        if (data.cover) {Session.set('cover', data.cover); Session.set('coverLabel', 'Borító');};
         Session.set('id', data.id);
+
+        Notifications.success(Session.get('author'), Session.get('title'));
 
         var id = Session.get('id');
 
         Meteor.call('checkMolyId', id, function(error, result) {
-          if (error) return console.log(error.reason);
-          //if (error) return throwError("Are you sure this is a valid URL?", "warning");
+          if (error) return Notifications.error('Valami nem stimmel.', 'Biztos vagy benne, hogy ez egy létező könyv?');
 
           var linkData = $.parseJSON(result);
 
@@ -78,29 +85,50 @@ Template.home.events({
       }
 
     });
-
-  },
-  'click .searchServer': function(e) {
+    
+  }, 1100, true),
+  'keyup #search': _.debounce(function(e) {
     e.preventDefault();
+
     var query = $('#search').val();
+
+    if (query.length < 2) {return false}
+
+    $('.toHide').fadeIn();
+
     var searchResults = $('#searchResults');
 
     searchResults.empty();
 
     Meteor.call('searchMoly', query, function (error, result) {
-      if (error) {
-        return console.log(error.reason);
-      } else {
-        var data = $.parseJSON(result);
-        Session.set('results', data.books);
+      
+      if (error) return Notifications.error('Valami nem stimmel.', 'Biztos vagy benne, hogy ez egy létező könyv?');
+
+      var data = $.parseJSON(result);
+
+      if (data.books.length < 1) return Notifications.warn('Valami nem stimmel.', 'Biztos vagy benne, hogy ez egy létező könyv?'); 
+      
+      Session.set('results', data.books);
         for (var i = 0; i < data.books.length; i++) {
 
           var toAppend = "<a id=\"" + [i] + "\" class=\"list-group-item\"><strong>" + data.books[i].title + "</strong> - " + data.books[i].author + "</a>";
           searchResults.append(toAppend);
           
         };
-      }
     });
+    
+  }, 1100),
+  'keypress #search': function(e) {
+    if (e.keyCode == 13) {
+      e.preventDefault();
+      return false;
+    };
+  },
+  'keypress #isbn': function(e) {
+    if (e.keyCode == 13) {
+      e.preventDefault();
+      return false;
+    };
   },
   'click .list-group-item': function() {
     var id = event.target.id;
@@ -108,8 +136,7 @@ Template.home.events({
     var queryId = selected[id].id;
 
     Meteor.call('checkMolyId', queryId, function(error, result) {
-      if (error) return console.log(error.reason);
-      //if (error) return throwError("Are you sure this is a valid URL?", "warning");
+      if (error) return Notifications.error('Valami nem stimmel.', 'Biztos vagy benne, hogy ez egy létező könyv?');
 
       var data = $.parseJSON(result);
 
@@ -121,17 +148,19 @@ Template.home.events({
       };
 
       authors = authors.join(", ");
-      console.log(authors);
 
       $('#author').val(authors);
       $('#title').val(data.book.title);
 
       Session.set('author', authors);
       Session.set('title', data.book.title);
-      if (data.book.cover) {Session.set('cover', data.book.cover);};
+      if (data.book.cover) {Session.set('cover', data.book.cover); Session.set('coverLabel', 'Borító');};
       Session.set('id', data.book.id);
 
+      Notifications.success(Session.get('author'), Session.get('title'));
+
       $('#searchResults').empty();
+      $('.toHide').hide();
       $('#search').val('');
     });
 

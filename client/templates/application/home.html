@@ -1,6 +1,8 @@
 <template name="home">
   {{#if currentUser}}
 
+  {{> notifications}}
+
   <form>
 
     <div class="panel panel-default">
@@ -8,54 +10,60 @@
         <h3 class="panel-title">Add el a könyved</h3>
       </div>
       <div class="panel-body">
-        <div class="row">          
-          <div class="form-group col-md-5">
-            <label for="isbn">Ha tudod az ISBN-t:</label>
-            <div class="input-group">
-              <input type="text" id="isbn" class="form-control" placeholder="9789632275451" val="">
-              <span class="input-group-btn">
-                <button class="btn btn-default callServer" type="button">Kitöltőmágia 
-                  <span class="fa fa-caret-right"></span>
-                </button>
-              </span>
+        <div class="row"> 
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="search">Keress cím, szerző alapján</label>
+              <div class="input-group">
+                <input type="text" id="search" class="form-control" placeholder="Csak kezdd el gépelni..." val="">
+                <span class="input-group-addon">
+                  <span class="fa fa-search"></span>
+                </span>
+              </div>
             </div>
-            <span class="help-block">Az ISBN számot általában a könyv vonalkódján találod meg (régebbi könyveknél pedig legtöbbször az utolsó lapok egyikén).</span>
-          </div>
+            <div class="form-group">
+              <label for="title">Cím</label>
+              <input type="text" id="title" class="form-control" placeholder="The title" val="{{title}}">
+            </div>
+            <div class="form-group">
+              <label for="title">Szerző(k)</label>
+              <input type="text" id="author" class="form-control" placeholder="Author's" val="{{author}}">
+            </div>
+          </div>         
           <div class="col-md-2">
+            <h5 class="text-muted"><span>{{coverLabel}}</span></h5>
             <div class="thumbnail">
               <a href="{{link}}">
                 <img src="{{cover}}" class="img-responsive" title="Köszönjük a Moly.hu-nak a segítséget!" alt="Köszönjük a Moly.hu-nak a segítséget!">
               </a>
             </div>
           </div>
-          <div class="form-group col-md-5">
-            <label for="search">Vagy keress cím, szerző alapján</label>
-            <input type="text" id="search" class="form-control" placeholder="Csak kezdd el gépelni..." val="">
-            <button class="searchServer btn btn-default">?</button>
+          <div class="form-group col-md-4">
+            <label for="isbn">Vagy ha tudod az ISBN-t:</label>
+            <div class="input-group">
+              <input type="text" id="isbn" class="form-control" placeholder="9789632275451" val="">
+              <span class="input-group-btn">
+                <button class="btn btn-primary callServer" type="button">
+                  <span class="fa fa-magic"></span>
+                </button>
+              </span>
+            </div>
+            <span class="help-block"><small>Az ISBN számot általában a könyv vonalkódján találod meg (régebbi könyveknél pedig legtöbbször az utolsó lapok egyikén).</small></span>
+            <img src="/isbn.png" class="img-responsive" title="ISBN" alt="ISBN">
           </div>
         </div>
-        <div class="row">
+        <div class="row toHide">
           <div class="col-md-12">
-            <div id="searchResults" class="list-group">
-            </div>
-          </div>
-        </div>
-
-        <h5 class="text-muted"><span>a könyv</span></h5>
-
-        <div class="row">
-          <div class="col-md-10">
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input type="text" id="title" class="form-control" placeholder="The title" val="{{title}}">
-            </div>
-            <div class="form-group">
-              <label for="title">Author(s)</label>
-              <input type="text" id="author" class="form-control" placeholder="Author's" val="{{author}}">
-            </div>
-          </div>
-          <div class="col-md-2">
-            <img id="cover" class="img-responsive img-thumbnail" src="{{cover}}">
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">Keresési eredmények:</h3>
+              </div>
+              <div class="panel-body">
+                <div id="searchResults" class="list-group">
+                </div>
+              </div>
+              <div class="panel-footer">Kattints a könyvre!</div>
+            </div>      
           </div>
         </div>
 
