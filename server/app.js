@@ -1,7 +1,7 @@
 Meteor.startup(function() {
   Meteor.methods({
     checkMolyISBN: function (isbn) {
-      check(isbn, String);
+      //check(isbn, String);
       this.unblock();
 
       var query = "http://moly.hu/api/book_by_isbn.json?q=" + isbn;
@@ -14,7 +14,7 @@ Meteor.startup(function() {
       }
     },
     checkMolyId: function (id) {
-      check(id, Match.Any);
+      //check(id, Match.Any);
       this.unblock();
 
       var query = "http://moly.hu/api/book/" + id + ".json";
@@ -28,7 +28,7 @@ Meteor.startup(function() {
       }
     },
     searchMoly: function (query) {
-      check(query, String);
+      //check(query, String);
       this.unblock();
 
       var searchQuery = "http://moly.hu/api/books.json?q=" + query;

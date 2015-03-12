@@ -1,7 +1,7 @@
 Template.home.created = function () {
   Session.set('author', '');
   Session.set('title', '');
-  Session.set('id', '');
+  Session.set('id', 0);
   Session.set('cover', '/moly-logo.jpeg');
   Session.set('coverLabel', 'Köszi, Moly!');
   Session.set('link', 'http://moly.hu');
@@ -14,7 +14,7 @@ Template.home.rendered = function() {
 
 Template.home.helpers({
   books: function() {
-    return Books.find();
+    return Books.find({}, {sort: {submitted: -1}});
   },
   author: function () {
     return Session.get('author');
@@ -30,25 +30,30 @@ Template.home.helpers({
   },
   link: function() {
     return Session.get('link');
+  },
+  email: function() {
+    return Meteor.user().emails[0].address;
   }
 });
 
 Template.home.events({
-  // 'submit form': function(e) {
-  //   e.preventDefault();
-  //   
-  //   var book = {
-  //     title: $(e.target).find('[name=title]').val(),
-  //     author: $(e.target).find('[name=author]').val(),
-  //   };
-  //       
-  //   Meteor.call('bookInsert', book, function(error, result) {
-  //      if (error)
-  //        return console.log(error.reason);
-  //        //return throwError(error.reason, "danger");
-  //       //throwError("This new excellent thought was successfully added to your mind-palace.", "success");  
-  //   });
-  // },
+  'submit form': function(e) {
+    e.preventDefault();
+    
+    var book = {
+      title: $('#title').val(),
+      author: $('#author').val(),
+      status: $('#status').val(),
+      price: $('#price').val(),
+      bookId: Session.get('id'),
+      cover: Session.get('cover'),
+      link: Session.get('link')
+    };
+        
+    Meteor.call('bookInsert', book, function(error, result) {
+       if (error) Notifications.error('Valami nem stimmel.', 'Próbáld meg újra betölteni az oldalt.');
+    });
+  },
   'click .callServer': _.debounce(function (e) {
     e.preventDefault();
 
@@ -89,6 +94,7 @@ Template.home.events({
   }, 1100, true),
   'keyup #search': _.debounce(function(e) {
     e.preventDefault();
+    $('#isbn').val('');
 
     var query = $('#search').val();
 
